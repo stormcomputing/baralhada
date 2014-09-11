@@ -12,6 +12,12 @@
     "gulp-mocha": "latest",
     "mocha": "latest",
     "supertest": "latest",
-    "gulp-coffeelint": "latest"
+    "gulp-coffeelint": "latest",
+    "gulp-browserify": "latest",
+    "coffeeify": "latest",
+    "gulp-rename": "latest",
+    "karma": "latest",
+    "karma-chrome-launcher": "latest",
+    "karma-mocha": "latest"
   }
 }
