@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "sjcl": "latest"
+  },
+  "devDependencies": {
+    "chai": "latest",
+    "coffee-script": "latest",
+    "gulp": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-mocha": "latest",
+    "mocha": "latest"
+  }
+}
