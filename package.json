@@ -1,6 +1,8 @@
 {
   "dependencies": {
-    "sjcl": "latest"
+    "sjcl": "latest",
+    "body-parser": "latest",
+    "express": "latest"
   },
   "devDependencies": {
     "chai": "latest",
@@ -8,6 +10,7 @@
     "gulp": "latest",
     "gulp-load-plugins": "latest",
     "gulp-mocha": "latest",
-    "mocha": "latest"
+    "mocha": "latest",
+    "supertest": "latest"
   }
 }
