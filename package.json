@@ -11,6 +11,7 @@
     "gulp-load-plugins": "latest",
     "gulp-mocha": "latest",
     "mocha": "latest",
-    "supertest": "latest"
+    "supertest": "latest",
+    "gulp-coffeelint": "latest"
   }
 }
