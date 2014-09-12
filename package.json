@@ -2,7 +2,8 @@
   "dependencies": {
     "sjcl": "latest",
     "body-parser": "latest",
-    "express": "latest"
+    "express": "latest",
+    "firebase": "latest"
   },
   "devDependencies": {
     "chai": "latest",
@@ -18,6 +19,9 @@
     "gulp-rename": "latest",
     "karma": "latest",
     "karma-chrome-launcher": "latest",
-    "karma-mocha": "latest"
+    "karma-mocha": "latest",
+    "browser-sync": "latest",
+    "gulp-jade": "latest",
+    "gulp-coffee": "latest"
   }
 }

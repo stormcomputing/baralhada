@@ -1,0 +1,41 @@
+doctype html
+html(lang="en")
+  head
+    script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.js')
+    script(src="//cdn.firebase.com/js/client/1.0.21/firebase.js")
+    script(src="//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js")
+    script(src="//bitwiseshiftleft.github.io/sjcl/sjcl.js")
+    script(src='app.js')
+    title baralhada
+  body(ng-app='baralhada')
+    h1 baralhada
+    #container
+      #player(ng-controller='PlayerCtrl')
+        h2 player {{player.name}}
+        input(ng-disabled='player',ng-model='player_name',placeholder='player name')
+        button(ng-disabled='!player_name || player',ng-click='newPlayer(player_name)') new player
+      #table(ng-controller='TableCtrl')
+        h2 table {{table.id}}
+        button(ng-disabled='table',ng-click='newTable()') new table
+        input(ng-model='table_id',placeholder='table id')
+        input(ng-model='table_secret',placeholder='table secret')
+        button(
+          ng-disabled='!table_id || !table_secret || !player || table.players[player.id]'
+          ng-click='joinTable(table_id, table_secret, player.id, player.secret)') join table
+        button(ng-disabled='!table_id' ng-click='viewTable(table_id)') view table
+      #hand(ng-controller='HandCtrl')
+        h2 hand {{hand.id}}
+        button(ng-disabled='!table',ng-click='newHand(table.id, table.secret)') new hand
+        button(ng-disabled='!hand.id',ng-click='placeCard(hand.id, table.secret)') place community card
+        #community_cards
+          h3 community cards
+          #community_card(ng-repeat='c in hand.community_cards')
+            span {{toUnicode(c)}}
+        #pocket_cards
+          h3 pocket cards
+          #players
+            #player(ng-repeat='p in hand.table_players')
+              span {{p.name}}
+              button(ng-click='dealCard(hand.id, table.secret, p.id)') deal pocket card
+              #pocket_card(ng-repeat='c in hand.pocket_cards[p.id]')
+                span(ng-init='card=decript(c, player.secret)') {{toUnicode(card)}}
