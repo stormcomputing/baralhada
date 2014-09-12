@@ -22,6 +22,7 @@
     "karma-mocha": "latest",
     "browser-sync": "latest",
     "gulp-jade": "latest",
-    "gulp-coffee": "latest"
+    "gulp-coffee": "latest",
+    "gulp-sass": "latest"
   }
 }

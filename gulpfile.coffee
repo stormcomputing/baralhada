@@ -21,6 +21,12 @@ gulp.task 'mocha', ->
     .src ['src/test/*.coffee'], read: false
     .pipe plugins.mocha()
 
+gulp.task 'sass', ->
+  gulp
+    .src ['src/ui/*.scss']
+    .pipe plugins.sass()
+    .pipe gulp.dest 'target/ui'
+
 gulp.task 'jade', ->
   gulp
     .src ['src/ui/*.jade']
@@ -54,7 +60,8 @@ gulp.task 'karma', ['coffeeify'], (done) ->
 
 gulp.task 'watch', ['browser-sync'], ->
   reload = browserSync.reload
+  gulp.watch 'src/ui/*.scss', ['sass',reload]
   gulp.watch 'src/ui/*.jade', ['jade',reload]
   gulp.watch 'src/**/*.coffee', ['coffee','coffeeify','mocha',reload]
 
-gulp.task 'default', ['coffee','jade','coffeelint','mocha'], ->
+gulp.task 'default', ['sass','coffee','jade','coffeelint','mocha'], ->
