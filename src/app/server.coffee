@@ -41,10 +41,12 @@ FirebaseDispatcher = (obj) ->
   withPublic "/#{obj.table_id}", (ref) ->
     ref.set obj, -> ref.unauth()
 
+port = process.env.PORT || 3000
+
 services = require './services'
 service = new services.Service new FirebaseRepository, FirebaseDispatcher
 
 resources = require './resources'
 resources.delegate = service
 resources.use express.static "#{__dirname}/../../target/ui"
-resources.listen 3000, -> console.log 'Listening on port 3000'
+resources.listen port, -> console.log "Listening on port #{port}"

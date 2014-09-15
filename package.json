@@ -2,12 +2,12 @@
   "dependencies": {
     "sjcl": "latest",
     "body-parser": "latest",
+    "coffee-script": "latest",
     "express": "latest",
     "firebase": "latest"
   },
   "devDependencies": {
     "chai": "latest",
-    "coffee-script": "latest",
     "gulp": "latest",
     "gulp-load-plugins": "latest",
     "gulp-mocha": "latest",
@@ -26,6 +26,7 @@
     "gulp-sass": "latest"
   },
   "scripts": {
-    "test": "gulp"
+    "test": "gulp",
+    "start": "coffee src/app/server.coffee"
   }
 }
