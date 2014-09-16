@@ -33,7 +33,7 @@ module.exports.HandView = class HandView
     @id = hand.id
     @table_id = hand.table.id
     @table_players = (new PlayerView p for k,p of hand.table.players)
-    @community_cards = hand.community_cards
+    @community_cards = hand.community_cards or []
     @pocket_cards = {}
     if hand.pocket_cards
       for player_id, cards of hand.pocket_cards

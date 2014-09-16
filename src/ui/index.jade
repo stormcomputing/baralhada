@@ -1,49 +1,49 @@
 doctype html
-html(lang="en")
+html(lang='en')
   head
     script(src='//ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.js')
-    script(src="//cdn.firebase.com/js/client/1.0.21/firebase.js")
-    script(src="//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js")
-    script(src="//bitwiseshiftleft.github.io/sjcl/sjcl.js")
-    link(href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css',rel='stylesheet')
-    //
-      link(href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css',rel='stylesheet')
-      link(href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.css",rel="stylesheet")
-      link(href='//fonts.googleapis.com/css?family=Roboto+Slab',rel='stylesheet')
-    link(href="app.css",rel="stylesheet")
+    script(src='//cdn.firebase.com/js/client/1.0.21/firebase.js')
+    script(src='//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.js')
+    script(src='//bitwiseshiftleft.github.io/sjcl/sjcl.js')
     script(src='app.js')
+    link(href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css',rel='stylesheet')
+    link(href='app.css',rel='stylesheet')
     title baralhada
   body(ng-app='baralhada'): .container
-    .row
-      .col-sm-6(ng-controller='PlayerCtrl',ng-hide='player.id')
+    .row(ng-controller='PlayerCtrl',ng-hide='player.id')
+      .col-sm-10
         input.form-control(ng-model='player_name',placeholder='player name')
-        button.btn.btn-primary(ng-disabled='!player_name',ng-click='newPlayer(player_name)') new player
-      .col-sm-12(ng-show='player.id')
-        span Hello {{player.name}}!
-    .row(ng-hide='!player')
-      .col-sm-6(ng-controller='TableCtrl',ng-hide='table.id')
+      .col-sm-2
+        button.btn-block.btn.btn-primary(ng-disabled='!player_name',ng-click='newPlayer(player_name)') new player
+    .row(ng-show='player.id')
+      .col-sm-12 Hello {{player.name}}!
+    .row(ng-controller='TableCtrl')
+      .col-sm-offset-10.col-sm-2
+        button.btn-block.btn.btn-primary(ng-click='newTable()') new table
+      .col-sm-10
         input.form-control(ng-model='table_id',placeholder='table id')
+      .col-sm-2
+        button.btn-block.btn.btn-info(ng-disabled='!table_id' ng-click='viewTable(table_id)') view table
+      .col-sm-10
         input.form-control(ng-model='table_secret',placeholder='table secret')
-        .btn-group
-          button.btn.btn-primary(ng-disabled='table',ng-click='newTable()') new table
-          button.btn.btn-success(
+      .col-sm-2
+        button.btn-block.btn.btn-success(
           ng-disabled='!table_id || !table_secret || !player || table.players[player.id]'
           ng-click='joinTable(table_id, table_secret, player.id, player.secret)') join table
-        button.btn.btn-info(ng-disabled='!table_id' ng-click='viewTable(table_id)') view table
       .col-sm-12(ng-show='table.id')
-        span Welcome to table {{table.id}}
+        span Welcome to table {{table.id}}!
         span(ng-hide='table.players[player.id]') (view-only)
     .row(ng-controller='HandCtrl',ng-show='table')
-      .col-sm-12
+      .col-sm-6.col-sm-offset-3
         .alert.alert-warning(ng-hide='hand.id') No hands started yet!
+      .col-sm-12
         .btn-group(ng-show='table.players[player.id]')
           button.btn.btn-primary(ng-click='newHand(table.id, table.secret)') new hand
-          button.btn.btn-success(ng-click='placeCard(hand.id, table.secret)') place community card
-        .row
-          span.card(ng-repeat='c in hand.community_cards') {{toUnicode(c)}}
-        .row(ng-repeat='p in hand.table_players')
-          .col-sm-2: span {{p.name}}
-          .col-sm-2: button.btn.btn-default(ng-click='dealCard(hand.id, table.secret, p.id)') deal pocket card
-          .col-sm-6
-            span.card(ng-repeat='c in hand.pocket_cards[p.id]') {{toUnicode(decript(c, player.secret))}}
-    .row(ng-controller='TestCtrl')
+          button.btn.btn-default(ng-click='placeCard(hand.id, table.secret)') place community card
+      .col-sm-12
+        span.card(ng-repeat='c in hand.community_cards') {{c.number}}{{c.suit}},
+      .col-sm-12(ng-repeat='p in hand.table_players')
+        .col-sm-3: span {{p.name}}
+        .col-sm-7
+            span.card(ng-repeat='i in hand.pocket_cards[p.id]',ng-init='c=decript(i, player.secret)') {{c.number}}{{c.suit}},
+        .col-sm-2: button.btn-block.btn.btn-default(ng-click='dealCard(hand.id, table.secret, p.id)') deal pocket card
