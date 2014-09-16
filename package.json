@@ -4,29 +4,30 @@
     "body-parser": "latest",
     "coffee-script": "latest",
     "express": "latest",
-    "firebase": "latest"
-  },
-  "devDependencies": {
-    "chai": "latest",
+    "firebase": "latest",
     "gulp": "latest",
-    "gulp-load-plugins": "latest",
-    "gulp-mocha": "latest",
-    "mocha": "latest",
-    "supertest": "latest",
-    "gulp-coffeelint": "latest",
-    "gulp-browserify": "latest",
-    "coffeeify": "latest",
-    "gulp-rename": "latest",
-    "karma": "latest",
-    "karma-chrome-launcher": "latest",
-    "karma-mocha": "latest",
-    "browser-sync": "latest",
     "gulp-jade": "latest",
     "gulp-coffee": "latest",
     "gulp-sass": "latest"
   },
+  "devDependencies": {
+    "chai": "latest",
+    "mocha": "latest",
+    "gulp-mocha": "latest",
+    "gulp-coffeelint": "latest",
+    "gulp-browserify": "latest",
+    "gulp-load-plugins": "latest",
+    "supertest": "latest",
+    "coffeeify": "latest",
+    "gulp-rename": "latest",
+    "browser-sync": "latest",
+    "karma": "latest",
+    "karma-mocha": "latest",
+    "karma-chrome-launcher": "latest"
+  },
   "scripts": {
     "test": "gulp",
+    "postinstall": "gulp jade coffee sass",
     "start": "coffee src/app/server.coffee"
   }
 }
