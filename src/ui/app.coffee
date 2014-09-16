@@ -36,7 +36,11 @@ app.controller 'HandCtrl', ($scope, $http, $firebase) ->
       ref = new Firebase("http://baralhada-public.firebaseio.com/#{table.id}")
       $scope.$root.hand = $firebase(ref).$asObject()
 
-app.controller 'TableCtrl', ($scope, $http) ->
+app.controller 'TableCtrl', ($scope, $http, $location) ->
+
+  search = $location.search()
+  $scope.table_id = search.table_id
+  $scope.table_secret = search.table_secret
 
   $scope.newTable = ->
     $http.post '/table'
@@ -44,6 +48,8 @@ app.controller 'TableCtrl', ($scope, $http) ->
         $scope.$root.table = table
         $scope.table_id = table.id
         $scope.table_secret = table.secret
+        $location.search 'table_id', table.id
+        $location.search 'table_secret', table.secret
 
   $scope.viewTable = (table_id) ->
     $scope.$root.table = table: id: table_id
@@ -78,6 +84,8 @@ app.controller 'TestCtrl', ($scope, $location) ->
     delay 'new table', -> $scope.$root.table = id: 1
     delay 'join table', -> $scope.$root.table = id: 1, players: 1: tom
     delay 'new hand', -> $scope.$root.hand = id: 1
-    delay 'place community cards', -> $scope.$root.hand = id: 1, community_cards: [{suit:'H',number:'T'},{suit:'H',number:'A'}]
+    delay 'place community cards', -> $scope.$root.hand = id: 1, community_cards: [{suit:'H',number:'T'},
+      {suit:'H',number:'A'}]
     delay 'new hand with players', -> $scope.$root.hand = id: 1, table_players: [tom,joe]
-    delay 'deal pocket cards', -> $scope.$root.hand = id: 1, table_players: [tom,joe], pocket_cards: 1:[{suit:'H',number:'T'},{suit:'H',number:'A'}]
+    delay 'deal pocket cards', -> $scope.$root.hand = id: 1, table_players: [tom,joe], pocket_cards: 1:[
+      {suit:'H',number:'T'},{suit:'H',number:'A'}]
