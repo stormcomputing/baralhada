@@ -35,13 +35,12 @@ module.exports.HandView = class HandView
     @table_players = (new PlayerView p for k,p of hand.table.players)
     @community_cards = hand.community_cards or []
     @pocket_cards = {}
-    if hand.pocket_cards
-      for player_id, cards of hand.pocket_cards
-        player = hand.table.players[player_id]
-        @pocket_cards[player_id] = []
-        if cards
-          for c in cards
-            @pocket_cards[player_id].push u.encrypt c, player.secret
+    for player_id, cards of hand.pocket_cards
+      reveal = hand.reveals?.indexOf(player_id) >= 0
+      player_secret = hand.table.players[player_id].secret
+      @pocket_cards[player_id] = []
+      for c in cards
+        @pocket_cards[player_id].push if reveal then c else u.encrypt c, player_secret
 
 module.exports.Service = class Service
   constructor: (@repository, @dispatcher) ->
@@ -100,6 +99,13 @@ module.exports.Service = class Service
         hand.pocket_cards ?= {}
         hand.pocket_cards[player.id] ?= []
         hand.pocket_cards[player.id].push card
+        @updateHand hand, callback
+
+  revealCards: (hand_id, table_secret, player_id, player_secret, callback) ->
+    @withHand hand_id, table_secret, (hand) =>
+      @withPlayer player_id, player_secret, (player) =>
+        hand.reveals ?= []
+        hand.reveals.push player.id
         @updateHand hand, callback
 
   placeCard: (hand_id, table_secret, callback) ->

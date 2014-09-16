@@ -45,6 +45,7 @@ app.post '/hand/:hand_id', (request,response) ->
   hand_id = request.params.hand_id
   {table_secret} = body.place if body.place
   {table_secret,player_id} = body.deal if body.deal
+  {table_secret,player_id,player_secret} = body.reveal if body.reveal
 
   callback = (table_view) ->
     response
@@ -54,3 +55,4 @@ app.post '/hand/:hand_id', (request,response) ->
   switch
     when body.deal then app.delegate.dealCard hand_id, table_secret, player_id, callback
     when body.place then app.delegate.placeCard hand_id, table_secret, callback
+    when body.reveal then app.delegate.revealCards hand_id, table_secret, player_id, player_secret, callback

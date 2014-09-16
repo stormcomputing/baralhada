@@ -25,5 +25,6 @@ module.exports.Hand = class Hand
     @id = u.uid()
     @deck = []
     @deck.push new Card number, suit for number in NUMBERS for suit in SUITS
+    @reveals = []
     @pocket_cards = {}
     @community_cards = []

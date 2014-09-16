@@ -18,7 +18,7 @@ withNewHand = (callback) ->
     service.joinTable table1.id, table1.secret, player1.id, player1.secret, (table2) ->
       service.joinTable table1.id, table1.secret, player2.id, player2.secret, (table3) ->
         service.newHand table1.id, table1.secret, (hand) ->
-          setTimeout callback, 1, table3, hand
+          setTimeout callback, 1, table3, hand, player1, player2
 
 describe 'the services', ->
 
@@ -64,12 +64,26 @@ describe 'the services', ->
           done()
 
   it 'should deal pocket cards', (done) ->
-    withNewHand (table, hand) ->
-      player_id = hand.table_players[0].id
-      service.dealCard hand.id, table.secret, player_id, (hand) ->
-        expect(hand.pocket_cards[player_id]).to.length 1
-        service.dealCard hand.id, table.secret, player_id, (hand) ->
-          expect(hand.pocket_cards[player_id]).to.length 2
-          expect(hand.pocket_cards[player_id][0]).to.have.property 'cipher'
-          expect(hand.pocket_cards[player_id][1]).to.have.property 'cipher'
+    withNewHand (table, hand, player) ->
+      service.dealCard hand.id, table.secret, player.id, (hand) ->
+        expect(hand.pocket_cards[player.id]).to.length 1
+        service.dealCard hand.id, table.secret, player.id, (hand) ->
+          expect(hand.pocket_cards[player.id]).to.length 2
+          expect(hand.pocket_cards[player.id][0]).to.have.property 'cipher'
+          expect(hand.pocket_cards[player.id][1]).to.have.property 'cipher'
           done()
+
+  it 'should reveal pocket cards', (done) ->
+    withNewHand (table, hand, player) ->
+      service.dealCard hand.id, table.secret, player.id, (hand) ->
+        expect(hand.pocket_cards[player.id]).to.length 1
+        service.dealCard hand.id, table.secret, player.id, (hand) ->
+          expect(hand.pocket_cards[player.id]).to.length 2
+          expect(hand.pocket_cards[player.id][0]).to.have.property 'cipher'
+          expect(hand.pocket_cards[player.id][1]).to.have.property 'cipher'
+          service.revealCards hand.id, table.secret, player.id, player.secret, (hand) ->
+            expect(hand.pocket_cards[player.id][0]).to.have.property 'suit'
+            expect(hand.pocket_cards[player.id][0]).to.have.property 'number'
+            expect(hand.pocket_cards[player.id][1]).to.have.property 'suit'
+            expect(hand.pocket_cards[player.id][1]).to.have.property 'number'
+            done()

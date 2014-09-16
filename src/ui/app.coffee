@@ -15,7 +15,12 @@ app.controller 'HandCtrl', ($scope, $http, $firebase) ->
     data = deal: player_id: player_id, table_secret: table_secret
     $http.post "/hand/#{hand_id}", data
 
+  $scope.revealCards = (hand_id, table_secret, player_id, player_secret) ->
+    data = reveal: player_id: player_id, table_secret: table_secret, player_secret: player_secret
+    $http.post "/hand/#{hand_id}", data
+
   $scope.decript = (encrypted, player_secret) ->
+    return encrypted if encrypted.suit and encrypted.number
     string = angular.toJson encrypted
     try
       angular.fromJson sjcl.decrypt player_secret, string

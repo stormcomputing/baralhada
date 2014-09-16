@@ -102,3 +102,17 @@ describe 'the resources', ->
       .expect 'Content-Type', /json/
       .expect 'Content-Length', 438
       .expect 201, done
+
+  it 'should reveal pocket cards', (done) ->
+
+    request(app)
+      .post "/hand/#{ctx.hand.id}"
+      .send
+        reveal:
+          table_id: ctx.table.id
+          table_secret: ctx.table.secret
+          player_id: ctx.players[0].id
+          player_secret: ctx.players[0].secret
+      .expect 'Content-Type', /json/
+      .expect 'Content-Length', 282
+      .expect 201, done

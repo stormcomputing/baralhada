@@ -44,6 +44,8 @@ html(lang='en')
         span.card(ng-repeat='c in hand.community_cards') {{c.number}}{{c.suit}},
       .col-sm-12(ng-repeat='p in hand.table_players')
         .col-sm-3: span {{p.name}}
-        .col-sm-7
+        .col-sm-5
             span.card(ng-repeat='i in hand.pocket_cards[p.id]',ng-init='c=decript(i, player.secret)') {{c.number}}{{c.suit}},
         .col-sm-2: button.btn-block.btn.btn-default(ng-click='dealCard(hand.id, table.secret, p.id)') deal pocket card
+        .col-sm-2: button.btn-block.btn.btn-default(ng-show='p.id == player.id',
+          ng-click='revealCards(hand.id, table.secret, player.id, player.secret)') reveal pocket cards
