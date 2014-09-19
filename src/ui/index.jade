@@ -3,16 +3,15 @@ html(lang='en')
   head
     link(href='//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css',rel='stylesheet')
     link(href='app.css',rel='stylesheet')
+    script(src='//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.js',data-main='main')
     title baralhada
   body(ng-app='baralhada')
     .container
-      .row(ng-controller='PlayerCtrl',ng-hide='player.id')
-        .col-sm-10
-          input.form-control(ng-model='player_name',placeholder='player name')
+      .row(ng-controller='LoginCtrl')
+        .col-sm-2: img(ng-src='{{auth.image.url}}')
+        .col-sm-8: span(ng-show='auth') Hello {{auth.displayName}}!
         .col-sm-2
-          button.btn-block.btn.btn-primary(ng-disabled='!player_name',ng-click='newPlayer(player_name)') new player
-      .row(ng-show='player.id')
-        .col-sm-12 Hello {{player.name}}!
+          button.btn-block.btn.btn-primary(ng-hide='auth',ng-click='login()') login
       .row(ng-controller='TableCtrl')
         .col-sm-offset-10.col-sm-2
           button.btn-block.btn.btn-primary(ng-click='newTable()') new table
@@ -45,4 +44,3 @@ html(lang='en')
           .col-sm-2: button.btn-block.btn.btn-default(ng-click='dealCard(hand.id, table.secret, p.id)') deal pocket card
           .col-sm-2: button.btn-block.btn.btn-default(ng-show='p.id == player.id',
             ng-click='revealCards(hand.id, table.secret, player.id, player.secret)') reveal pocket cards
-    script(src='//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.js',data-main='main')

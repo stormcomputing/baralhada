@@ -2,16 +2,42 @@
 requirejs.config
   paths:
     sjcl: '//bitwiseshiftleft.github.io/sjcl/sjcl'
-    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.2.23/angular.min'
+    async: '//cdnjs.cloudflare.com/ajax/libs/requirejs-plugins/1.0.3/async.min'
+    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min'
     firebase: '//cdn.firebase.com/js/client/1.0.21/firebase'
     angularfire: '//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.min'
+
   shim:
     angular: exports: 'angular'
     angularfire: deps: ['angular','firebase']
 
-define ['angular','sjcl','angularfire'], (angular, sjcl) ->
+define 'gapi', ['async!//apis.google.com/js/client.js!onload'], ->
+  gapi.client.setApiKey 'AIzaSyB5_lIi7P3JCqFf5wzFywtsgeiHn1eNHTU'
+
+define ['angular','sjcl','angularfire','gapi'], (angular, sjcl) ->
 
   app = angular.module 'baralhada', ['firebase']
+
+  app.controller 'LoginCtrl', ($scope, $http) ->
+
+    $scope.login = ->
+      gapi.auth.authorize
+        immediate: true
+        scope: 'https://www.googleapis.com/auth/plus.me'
+        client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
+        (auth) ->
+          gapi.client.load 'plus', 'v1', ->
+            gapi.client.plus.people.get(userId: 'me').execute (auth) ->
+
+              $scope.$root.auth = auth
+              $scope.$root.$digest()
+
+              $http.post '/player', name: auth.displayName, img: auth.image.url
+                .success (player) ->
+                  $scope.$root.player = player
+                  $scope.$root.$digest()
+
+    $scope.login() # silent login
 
   app.controller 'HandCtrl', ($scope, $http, $firebase) ->
 
@@ -66,10 +92,3 @@ define ['angular','sjcl','angularfire'], (angular, sjcl) ->
       data = join: {table_id, table_secret, player_id, player_secret}
       $http.post "/table/#{table_id}", data
         .success (table) -> $scope.$root.table = table
-
-  app.controller 'PlayerCtrl', ($scope, $http) ->
-
-    $scope.newPlayer = (player_name) ->
-      data = name: player_name
-      $http.post '/player', data
-        .success (player) -> $scope.$root.player = player
