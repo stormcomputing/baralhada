@@ -1,43 +1,51 @@
 
 requirejs.config
   paths:
+    css: '//cdnjs.cloudflare.com/ajax/libs/require-css/0.1.1/css'
     sjcl: '//bitwiseshiftleft.github.io/sjcl/sjcl'
-    async: '//cdnjs.cloudflare.com/ajax/libs/requirejs-plugins/1.0.3/async.min'
-    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min'
+    async: '//cdnjs.cloudflare.com/ajax/libs/requirejs-plugins/1.0.3/async'
+    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular'
     firebase: '//cdn.firebase.com/js/client/1.0.21/firebase'
-    angularfire: '//cdn.firebase.com/libs/angularfire/0.8.2/angularfire.min'
+    angularfire: '//cdn.firebase.com/libs/angularfire/0.8.2/angularfire'
 
   shim:
+    sjcl: exports: 'sjcl'
     angular: exports: 'angular'
     angularfire: deps: ['angular','firebase']
 
+define 'styles', [
+  'css!app'
+  'css!//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap'
+  'css!//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome'
+]
+
 define 'gapi', ['async!//apis.google.com/js/client.js!onload'], ->
   gapi.client.setApiKey 'AIzaSyB5_lIi7P3JCqFf5wzFywtsgeiHn1eNHTU'
+  gapi.auth.init ->
 
-define ['angular','sjcl','angularfire','gapi'], (angular, sjcl) ->
+define 'app', ['angular','sjcl','angularfire','gapi'], (angular, sjcl) ->
 
   app = angular.module 'baralhada', ['firebase']
 
   app.controller 'LoginCtrl', ($scope, $http) ->
-
-    $scope.login = ->
+    $scope.login = (immediate=false) ->
       gapi.auth.authorize
-        immediate: true
+        immediate: immediate
         scope: 'https://www.googleapis.com/auth/plus.me'
         client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
         (auth) ->
-          gapi.client.load 'plus', 'v1', ->
-            gapi.client.plus.people.get(userId: 'me').execute (auth) ->
+          if auth.status.signed_in
+            gapi.client.load 'plus', 'v1', ->
+              gapi.client.plus.people.get(userId: 'me').execute (user) ->
+                $scope.$root.user = user
+                $scope.$root.$digest()
 
-              $scope.$root.auth = auth
-              $scope.$root.$digest()
+      $scope.$root.$watch 'user', (user) ->
+        if user
+          $http.post '/player', name: user.displayName, img: user.image.url
+            .success (player) -> $scope.$root.player = player
 
-              $http.post '/player', name: auth.displayName, img: auth.image.url
-                .success (player) ->
-                  $scope.$root.player = player
-                  $scope.$root.$digest()
-
-    $scope.login() # silent login
+    $scope.login true #silent login
 
   app.controller 'HandCtrl', ($scope, $http, $firebase) ->
 
@@ -92,3 +100,6 @@ define ['angular','sjcl','angularfire','gapi'], (angular, sjcl) ->
       data = join: {table_id, table_secret, player_id, player_secret}
       $http.post "/table/#{table_id}", data
         .success (table) -> $scope.$root.table = table
+
+define ['angular','app','styles'], (angular) ->
+  angular.bootstrap(document, ['baralhada']);

@@ -8,6 +8,7 @@ gulp.task 'browser-sync', ->
   browserSync
     open: false
     ghostMode: false
+    files: 'target/ui/*'
     server: baseDir: 'target/ui'
 
 gulp.task 'coffeelint', ->
@@ -59,9 +60,8 @@ gulp.task 'karma', ['coffeeify'], (done) ->
   karma.start config, done
 
 gulp.task 'watch', ['browser-sync'], ->
-  reload = browserSync.reload
-  gulp.watch 'src/ui/*.scss', ['sass',reload]
-  gulp.watch 'src/ui/*.jade', ['jade',reload]
-  gulp.watch 'src/**/*.coffee', ['coffee','coffeeify','mocha',reload]
+  gulp.watch 'src/ui/*.scss', ['sass']
+  gulp.watch 'src/ui/*.jade', ['jade']
+  gulp.watch 'src/**/*.coffee', ['coffee','coffeeify','mocha']
 
 gulp.task 'default', ['sass','coffee','jade','coffeelint','mocha'], ->
