@@ -22,9 +22,9 @@ app.post '/table/:table_id', (request,response) ->
 
 app.post '/player', (request,response) ->
 
-  name = request.body.name
+  {img, name} = request.body
 
-  app.delegate.newPlayer name, (player) ->
+  app.delegate.newPlayer name, img, (player) ->
     response
       .status 201
       .send player

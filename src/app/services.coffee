@@ -52,9 +52,9 @@ module.exports.Service = class Service
     callback table
     @repository.setTable table
 
-  newPlayer: (name, callback) ->
+  newPlayer: (name, img, callback) ->
 
-    player = new model.Player name
+    player = new model.Player name, img
 
     callback player
     @repository.setPlayer player

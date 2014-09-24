@@ -10,7 +10,7 @@ module.exports.Card = class Card
   constructor: (@number, @suit) ->
 
 module.exports.Player = class Player
-  constructor: (@name) ->
+  constructor: (@name, @img) ->
     @id = u.uid()
     @secret = u.uid()
 
