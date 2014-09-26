@@ -54,6 +54,7 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
   app.controller 'HandCtrl', ($scope, $http, $firebase) ->
 
     $scope.newHand = (table_id, table_secret) ->
+      console.log 'oi'
       data = start: table_secret: table_secret
       $http.post "/table/#{table_id}/hands", data
 

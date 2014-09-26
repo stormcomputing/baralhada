@@ -26,24 +26,25 @@ html(lang='en')
           span Welcome to table {{table.id}}!
           span(ng-hide='table.players[player.id]') (view-only)
       .row(ng-controller='HandCtrl',ng-show='table')
-        .col-xs-10.col-xs-offset-1
-          .alert.alert-warning(ng-hide='hand.id') No hands started yet!
-      .row(ng-show='table.players[player.id]')
-        .col-xs-6: button.btn.btn-block.btn-primary(ng-click='newHand(table.id, table.secret)') new hand
-        .col-xs-6: button.btn.btn-block.btn-default(ng-click='placeCard(hand.id, table.secret)') place community card
-      .row
-        .col-xs-2(ng-repeat='c in hand.community_cards') {{c.number}}{{c.suit}},
-      .row(ng-repeat='p in hand.table_players')
-          .col-xs-8 {{p.name}}
-          .col-xs-4: .btn-group
-            button.btn.btn-default(
-              ng-show='table.players[player.id]',
-              ng-click='dealCard(hand.id, table.secret, p.id)')
-                i.fa.fa-sign-in
-                //deal pocket card
-            button.btn.btn-default(ng-show='p.id == player.id',
-              ng-click='revealCards(hand.id, table.secret, player.id, player.secret)')
-                i.fa.fa-eye
-                //reveal pocket cards
-          .col-xs-2(ng-repeat='i in hand.pocket_cards[p.id]',ng-init='c=decript(i, player.secret)') {{c.number}}{{c.suit}},
+        .row
+          .col-xs-10.col-xs-offset-1
+            .alert.alert-warning(ng-hide='hand.id') No hands started yet!
+        .row(ng-show='table.players[player.id]')
+          .col-xs-6: button.btn.btn-block.btn-primary(ng-click='newHand(table.id, table.secret)') new hand
+          .col-xs-6: button.btn.btn-block.btn-default(ng-click='placeCard(hand.id, table.secret)') place community card
+        .row
+          .col-xs-2(ng-repeat='c in hand.community_cards') {{c.number}}{{c.suit}},
+        .row(ng-repeat='p in hand.table_players')
+            .col-xs-8 {{p.name}}
+            .col-xs-4: .btn-group
+              button.btn.btn-default(
+                ng-show='table.players[player.id]',
+                ng-click='dealCard(hand.id, table.secret, p.id)')
+                  i.fa.fa-sign-in
+                  //deal pocket card
+              button.btn.btn-default(ng-show='p.id == player.id',
+                ng-click='revealCards(hand.id, table.secret, player.id, player.secret)')
+                  i.fa.fa-eye
+                  //reveal pocket cards
+            .col-xs-2(ng-repeat='i in hand.pocket_cards[p.id]',ng-init='c=decript(i, player.secret)') {{c.number}}{{c.suit}},
     script(src='//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.14/require.js',data-main='main')
