@@ -43,32 +43,36 @@ module.exports.HandView = class HandView
         @pocket_cards[player_id].push if reveal then c else u.encrypt c, player_secret
 
 module.exports.Service = class Service
+
   constructor: (@repository, @dispatcher) ->
 
   newTable: (callback) ->
 
     table = new model.Table
 
-    callback table
-    @repository.setTable table
+    @repository.setTable table, callback
 
   newPlayer: (name, img, callback) ->
 
     player = new model.Player name, img
 
-    callback player
-    @repository.setPlayer player
+    @repository.setPlayer player, callback
 
   withTable: (table_id, table_secret, callback) ->
     @repository.getTable table_id, (table) ->
-      callback table if table.secret == table_secret
+      throw new Error("table not found (table_id: #{table_id})") if not table
+      throw new Error("invalid table_secret") unless table.secret == table_secret
+      callback table
 
   withPlayer: (player_id, player_secret, callback) ->
     @repository.getPlayer player_id, (player) ->
-      callback player if player.secret == player_secret
+      throw new Error("player not found (player_id: #{player_id})") if not player
+      throw new Error("invalid player_secret") unless player.secret == player_secret
+      callback player
 
   withHand: (hand_id, table_secret, callback) ->
     @repository.getHand hand_id, (hand) =>
+      throw new Error("hand not found (hand_id: #{hand_id})") if not hand
       @withTable hand.table.id, table_secret, (table) ->
         callback hand
 
@@ -117,9 +121,10 @@ module.exports.Service = class Service
 
 module.exports.SimpleRepository = class SimpleRepository
   constructor: -> @storage = {}
-  set: (obj, type, callback) ->
+  set: (obj, callback) ->
     @storage[obj.id] = obj
     callback? obj
+
   get: (id, callback) -> callback @storage[id]
   setHand: (hand, callback) -> @set hand, callback
   setTable: (table, callback) -> @set table, callback

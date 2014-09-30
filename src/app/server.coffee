@@ -1,5 +1,4 @@
 
-express = require 'express'
 Firebase = require 'firebase'
 
 withFirebase = (appName, auth, path, doWithFirebase) ->
@@ -19,16 +18,15 @@ class FirebaseRepository
 
     withPrivate "/#{collection}/#{obj.id}", (ref) ->
       ref.set obj, ->
+        callback obj if callback
         ref.unauth()
-        callback? obj
 
   get: (collection, id, callback) ->
 
     withPrivate "/#{collection}/#{id}", (ref) ->
       ref.once 'value', (snapshot) ->
-        obj = snapshot.val()
+        callback snapshot.val()
         ref.unauth()
-        callback obj
 
   setHand: (hand, callback) -> @set 'hands', hand, callback
   setTable: (table, callback) -> @set 'tables', table, callback
@@ -43,10 +41,21 @@ FirebaseDispatcher = (obj) ->
 
 port = process.env.PORT || 3000
 
+morgan = require 'morgan'
+express = require 'express'
+bodyParser = require 'body-parser'
+
 services = require './services'
 service = new services.Service new FirebaseRepository, FirebaseDispatcher
 
 resources = require './resources'
 resources.delegate = service
-resources.use express.static "#{__dirname}/../../target/ui"
-resources.listen port, -> console.log "Listening on port #{port}"
+
+app = express()
+app.use morgan 'dev'
+app.use bodyParser.json()
+app.use express.static "#{__dirname}/../../target/ui"
+app.use '/', resources
+
+app.listen port
+console.log "Listening on port #{port}"

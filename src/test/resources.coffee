@@ -1,6 +1,8 @@
 
 #3pp libs
-request = require 'supertest'
+express = require 'express'
+supertest = require 'supertest'
+bodyParser = require 'body-parser'
 expect = require('chai').expect
 
 #application scripts
@@ -11,14 +13,17 @@ describe 'the resources', ->
   repo = new services.SimpleRepository
   service = new services.Service repo
 
-  app = require '../app/resources'
-  app.delegate = service
+  resources = require '../app/resources'
+  resources.delegate = service
+  app = express()
+  app.use bodyParser.json()
+  app.use '/', resources
 
   ctx = {}
   ctx.players = []
 
   it 'should POST /table', (done) ->
-    request(app)
+    supertest(app)
       .post '/table'
       .expect 'Content-Type', /json/
       .expect 'Content-Length', 50
@@ -27,7 +32,7 @@ describe 'the resources', ->
         done()
 
   it 'should POST /player (1)', (done) ->
-    request(app)
+    supertest(app)
       .post '/player'
       .send name: 'Test Player 1'
       .expect 'Content-Type', /json/
@@ -37,7 +42,7 @@ describe 'the resources', ->
         done()
 
   it 'should POST /player (2)', (done) ->
-    request(app)
+    supertest(app)
       .post '/player'
       .send name: 'Test Player 2'
       .expect 'Content-Type', /json/
@@ -47,7 +52,7 @@ describe 'the resources', ->
         done()
 
   it 'should POST /player (3)', (done) ->
-    request(app)
+    supertest(app)
       .post '/player'
       .send name: 'Test Player 3'
       .expect 'Content-Type', /json/
@@ -60,7 +65,7 @@ describe 'the resources', ->
 
     join = (idx, size, cb) ->
 
-      request(app)
+      supertest(app)
         .post "/table/#{ctx.table.id}"
         .send
           join:
@@ -76,7 +81,7 @@ describe 'the resources', ->
 
   it 'should start hands', (done) ->
 
-    request(app)
+    supertest(app)
       .post "/table/#{ctx.table.id}/hands"
       .send start: table_secret: ctx.table.secret
       .expect 'Content-Type', /json/
@@ -87,7 +92,7 @@ describe 'the resources', ->
 
   it 'should place community cards', (done) ->
 
-    request(app)
+    supertest(app)
       .post "/hand/#{ctx.hand.id}"
       .send place: table_secret: ctx.table.secret
       .expect 'Content-Type', /json/
@@ -96,7 +101,7 @@ describe 'the resources', ->
 
   it 'should deal pocket cards', (done) ->
 
-    request(app)
+    supertest(app)
       .post "/hand/#{ctx.hand.id}"
       .send deal: player_id: ctx.players[0].id, table_secret: ctx.table.secret
       .expect 'Content-Type', /json/
@@ -105,7 +110,7 @@ describe 'the resources', ->
 
   it 'should reveal pocket cards', (done) ->
 
-    request(app)
+    supertest(app)
       .post "/hand/#{ctx.hand.id}"
       .send
         reveal:

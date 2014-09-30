@@ -3,7 +3,7 @@ requirejs.config
   paths:
     css: '//cdnjs.cloudflare.com/ajax/libs/require-css/0.1.1/css'
     sjcl: '//bitwiseshiftleft.github.io/sjcl/sjcl'
-    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular'
+    angular: '//ajax.googleapis.com/ajax/libs/angularjs/1.3.0-rc.3/angular'
     firebase: '//cdn.firebase.com/js/client/1.0.21/firebase'
     angularfire: '//cdn.firebase.com/libs/angularfire/0.8.2/angularfire'
   shim:
@@ -20,7 +20,8 @@ define 'g', ->
     req ['gapi!client'], ->
       gapi.client.load api, version, onload
 
-define 'gapis', ['gapi!auth','g!plus,v1']
+define 'gapis', ['gapi!auth','g!plus,v1','g!urlshortener,v1'], ->
+  gapi.client.setApiKey 'AIzaSyCCPYwacm8CTggmXdcrqpRJRCmTDpN6xA4'
 
 define 'styles', [
   'css!app'
@@ -38,23 +39,20 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
         immediate: immediate
         scope: 'https://www.googleapis.com/auth/plus.me'
         client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
-        (auth) ->
-          if auth.status.signed_in
-            gapi.client.plus.people.get(userId: 'me').execute (user) ->
-              $scope.$root.user = user
-              $scope.$root.$digest()
+        (auth) -> if auth.status.signed_in
+          gapi.client.plus.people.get(userId: 'me').execute (user) ->
+            $scope.$root.user = user
+            $scope.$root.$digest()
 
-      $scope.$root.$watch 'user', (user) ->
-        if user
-          $http.post '/player', name: user.displayName, img: user.image.url
-            .success (player) -> $scope.$root.player = player
+      $scope.$root.$watch 'user', (user) -> if user
+        $http.post '/player', name: user.displayName, img: user.image.url
+          .success (player) -> $scope.$root.player = player
 
-    $scope.login true #silent login
+    $scope.login true # silent login
 
   app.controller 'HandCtrl', ($scope, $http, $firebase) ->
 
     $scope.newHand = (table_id, table_secret) ->
-      console.log 'oi'
       data = start: table_secret: table_secret
       $http.post "/table/#{table_id}/hands", data
 
@@ -78,33 +76,40 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
       catch err
         suit: 'X', number: 'X'
 
-    $scope.$root.$watch 'table', (table) ->
-      if table
-        ref = new Firebase("http://baralhada-public.firebaseio.com/#{table.id}")
-        $scope.$root.hand = $firebase(ref).$asObject()
+    $scope.$root.$watch 'table', (table) -> if table
+      ref = new Firebase("http://baralhada-public.firebaseio.com/#{table.id}")
+      $scope.$root.hand = $firebase(ref).$asObject()
 
   app.controller 'TableCtrl', ($scope, $http, $location) ->
 
-    search = $location.search()
-    $scope.table_id = search.table_id
-    $scope.table_secret = search.table_secret
+    {table_id,table_secret} = $location.search()
 
-    $scope.newTable = ->
-      $http.post '/table'
-        .success (table) ->
-          $scope.$root.table = table
-          $scope.table_id = table.id
-          $scope.table_secret = table.secret
-          $location.search 'table_id', table.id
-          $location.search 'table_secret', table.secret
-
-    $scope.viewTable = (table_id) ->
+    if table_id # view table
       $scope.$root.table = id: table_id
+    else # create table
+      $http.post('/table').success (table) -> $scope.$root.table = table
 
-    $scope.joinTable = (table_id, table_secret, player_id, player_secret) ->
-      data = join: {table_id, table_secret, player_id, player_secret}
-      $http.post "/table/#{table_id}", data
-        .success (table) -> $scope.$root.table = table
+    $scope.$root.$watchGroup ['player', 'table'], (values) ->
+
+      [player,table] = values
+      table_secret ?= table?.secret
+
+      if table
+        url = $location.absUrl()
+        $scope.$root.view_url = view_url = "#{url}#?table_id=#{table.id}"
+        if table.secret
+          $scope.$root.share_url = "#{view_url}&table_secret=#{table.secret}"
+
+      if player and table_secret and not table.players?[player.id] # join table
+
+        data = join:
+          table_id: table.id
+          player_id: player.id
+          table_secret: table_secret
+          player_secret: player.secret
+
+        $http.post "/table/#{table.id}", data
+          .success (table) -> $scope.$root.table = table
 
 define ['angular','app','styles'], (angular) ->
   angular.bootstrap document, ['baralhada']
