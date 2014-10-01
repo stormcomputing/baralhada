@@ -52,11 +52,14 @@ module.exports.Service = class Service
 
     @repository.setTable table, callback
 
-  newPlayer: (name, img, callback) ->
+  newPlayer: ({id, name, img}, callback) ->
 
-    player = new model.Player name, img
+    @repository.getPlayer id, (existing) ->
 
-    @repository.setPlayer player, callback
+      player = existing or new model.Player name, img
+      player.id = id if not existing
+
+      @repository.setPlayer player, callback
 
   withTable: (table_id, table_secret, callback) ->
     @repository.getTable table_id, (table) ->

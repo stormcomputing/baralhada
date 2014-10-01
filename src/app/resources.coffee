@@ -21,9 +21,9 @@ router.post '/table/:table_id', (request,response) ->
 
 router.post '/player', (request,response) ->
 
-  {img, name} = request.body
+  {id, img, name} = request.body
 
-  router.delegate.newPlayer name, img, (player) ->
+  router.delegate.newPlayer {id, name, img}, (player) ->
     response
       .status 201
       .send player

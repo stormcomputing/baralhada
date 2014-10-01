@@ -9,8 +9,8 @@ service = new services.Service repo
 
 withTableAndPlayers = (callback) ->
   service.newTable (table) ->
-    service.newPlayer 'Player 1', null, (player1) ->
-      service.newPlayer 'Player 2', null, (player2) ->
+    service.newPlayer name: 'Player 1', (player1) ->
+      service.newPlayer name: 'Player 2', (player2) ->
         setTimeout callback, 1, table, player1, player2
 
 withNewHand = (callback) ->
@@ -28,7 +28,7 @@ describe 'the services', ->
       done()
 
   it 'should create players with player name', (done) ->
-    service.newPlayer 'Player Name', null, (player) ->
+    service.newPlayer name: 'Player Name', (player) ->
       expect(player).to.exist
       done()
 

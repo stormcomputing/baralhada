@@ -42,9 +42,10 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
           gapi.client.plus.people.get(userId: 'me').execute (user) ->
             $scope.$root.user = user
             $scope.$root.$digest()
+            console.log auth, user
 
       $scope.$root.$watch 'user', (user) -> if user
-        $http.post '/player', name: user.displayName, img: user.image.url
+        $http.post '/player', id: user.id, name: user.displayName, img: user.image.url
           .success (player) -> $scope.$root.player = player
 
     $scope.login true # silent login
