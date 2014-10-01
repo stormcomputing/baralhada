@@ -14,8 +14,8 @@ html(lang='en')
           h3 Welcome to table {{table.id}}!
             small(ng-hide='table.players[player.id]') , view-only
       .row
-        .col-xs-6(ng-show='view_url'): i.fa.fa-share-alt: {{view_url}}
-        .col-xs-6(ng-show='share_url'): i.fa.fa-share-alt: {{share_url}}
+        .col-xs-6(ng-show='view_url'): i.fa.fa-share-alt: &nbsp;{{view_url}}
+        .col-xs-6(ng-show='share_url'): i.fa.fa-share-alt: &nbsp;{{share_url}}
     .container-fluid(ng-controller='HandCtrl',ng-show='table')
       .row
         .col-xs-10.col-xs-offset-1

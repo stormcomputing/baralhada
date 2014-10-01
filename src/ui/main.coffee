@@ -21,7 +21,6 @@ define 'g', ->
       gapi.client.load api, version, onload
 
 define 'gapis', ['gapi!auth','g!plus,v1','g!urlshortener,v1'], ->
-  gapi.client.setApiKey 'AIzaSyCCPYwacm8CTggmXdcrqpRJRCmTDpN6xA4'
 
 define 'styles', [
   'css!app'
@@ -37,7 +36,7 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
     $scope.login = (immediate=false) ->
       gapi.auth.authorize
         immediate: immediate
-        scope: 'https://www.googleapis.com/auth/plus.me'
+        scope: 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/urlshortener'
         client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
         (auth) -> if auth.status.signed_in
           gapi.client.plus.people.get(userId: 'me').execute (user) ->
@@ -95,10 +94,18 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
       table_secret ?= table?.secret
 
       if table
+
         url = $location.absUrl()
-        $scope.$root.view_url = view_url = "#{url}#?table_id=#{table.id}"
+        urlshortener = (url, callback) ->
+          request = gapi.client.urlshortener.url.insert resource: longUrl: url
+          request.execute (response) ->
+            callback response.id
+
+        view_url = "#{url}#?table_id=#{table.id}"
+        urlshortener view_url, (shortUrl) -> $scope.$root.view_url = shortUrl
         if table.secret
-          $scope.$root.share_url = "#{view_url}&table_secret=#{table.secret}"
+          share_url = "#{view_url}&table_secret=#{table.secret}"
+          urlshortener share_url, (shortUrl) -> $scope.$root.share_url = shortUrl
 
       if player and table_secret and not table.players?[player.id] # join table
 
