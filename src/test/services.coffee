@@ -79,11 +79,14 @@ describe 'the services', ->
         expect(hand.pocket_cards[player.id]).to.length 1
         service.dealCard hand.id, table.secret, player.id, (hand) ->
           expect(hand.pocket_cards[player.id]).to.length 2
-          expect(hand.pocket_cards[player.id][0]).to.have.property 'cipher'
-          expect(hand.pocket_cards[player.id][1]).to.have.property 'cipher'
-          service.revealCards hand.id, table.secret, player.id, player.secret, (hand) ->
+          [card1,card2] = hand.pocket_cards[player.id]
+          expect(card1).to.have.property 'cipher'
+          expect(card2).to.have.property 'cipher'
+          service.revealCard hand.id, table.secret, player.id, player.secret, 0, (hand) ->
             expect(hand.pocket_cards[player.id][0]).to.have.property 'suit'
             expect(hand.pocket_cards[player.id][0]).to.have.property 'number'
-            expect(hand.pocket_cards[player.id][1]).to.have.property 'suit'
-            expect(hand.pocket_cards[player.id][1]).to.have.property 'number'
-            done()
+            expect(hand.pocket_cards[player.id][1]).to.have.property 'cipher'
+            service.revealCard hand.id, table.secret, player.id, player.secret, 1, (hand) ->
+              expect(hand.pocket_cards[player.id][1]).to.have.property 'suit'
+              expect(hand.pocket_cards[player.id][1]).to.have.property 'number'
+              done()

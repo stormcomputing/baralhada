@@ -32,39 +32,39 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
 
   app = angular.module 'baralhada', ['firebase']
 
-  app.controller 'LoginCtrl', ($scope, $http) ->
-    $scope.login = (immediate=false) ->
+  app.controller 'LoginCtrl', ($rootScope, $http) ->
+    $rootScope.login = (immediate=false) ->
       gapi.auth.authorize
         immediate: immediate
         scope: 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/urlshortener'
         client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
         (auth) -> if auth.status.signed_in
           gapi.client.plus.people.get(userId: 'me').execute (user) ->
-            $scope.$root.user = user
-            $scope.$root.$digest()
+            $rootScope.user = user
+            $rootScope.$digest()
 
-      $scope.$root.$watch 'user', (user) -> if user
+      $rootScope.$watch 'user', (user) -> if user
         $http.post '/player', name: user.displayName, img: user.image.url
-          .success (player) -> $scope.$root.player = player
+          .success (player) -> $rootScope.player = player
 
-    $scope.login true # silent login
+    $rootScope.login true # silent login
 
   app.controller 'HandCtrl', ($scope, $http, $firebase) ->
 
     $scope.newHand = (table_id, table_secret) ->
-      data = start: table_secret: table_secret
+      data = start: {table_secret}
       $http.post "/table/#{table_id}/hands", data
 
     $scope.placeCard = (hand_id, table_secret) ->
-      data = place: table_secret: table_secret
+      data = place: {table_secret}
       $http.post "/hand/#{hand_id}", data
 
     $scope.dealCard = (hand_id, table_secret, player_id) ->
-      data = deal: player_id: player_id, table_secret: table_secret
+      data = deal: {player_id,table_secret}
       $http.post "/hand/#{hand_id}", data
 
-    $scope.revealCards = (hand_id, table_secret, player_id, player_secret) ->
-      data = reveal: player_id: player_id, table_secret: table_secret, player_secret: player_secret
+    $scope.revealCard = (hand_id, table_secret, player_id, player_secret, card_idx) ->
+      data = reveal: {player_id,table_secret,player_secret,card_idx}
       $http.post "/hand/#{hand_id}", data
 
     $scope.decript = (encrypted, player_secret) ->
@@ -82,6 +82,7 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
   app.controller 'TableCtrl', ($scope, $http, $location) ->
 
     {table_id,table_secret} = $location.search()
+    #$location.url ''
 
     if table_id # view table
       $scope.$root.table = id: table_id
@@ -102,10 +103,10 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
             callback response.id
 
         view_url = "#{url}#?table_id=#{table.id}"
-        urlshortener view_url, (shortUrl) -> $scope.$root.view_url = shortUrl
+        urlshortener view_url, (shortUrl) -> $scope.$root.view_url ?= shortUrl
         if table.secret
           share_url = "#{view_url}&table_secret=#{table.secret}"
-          urlshortener share_url, (shortUrl) -> $scope.$root.share_url = shortUrl
+          urlshortener share_url, (shortUrl) -> $scope.$root.share_url ?= shortUrl
 
       if player and table_secret and not table.players?[player.id] # join table
 

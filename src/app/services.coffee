@@ -1,4 +1,5 @@
 
+
 sjcl = require 'sjcl'
 model = require './model'
 
@@ -13,8 +14,12 @@ u =
     return shuffled
   encrypt: (object, password) ->
     json = JSON.stringify object
-    encrypt = sjcl.encrypt password, json
-    JSON.parse encrypt
+    encrypted = sjcl.encrypt password, json
+    JSON.parse encrypted
+  decrypt: (encrypted, password) ->
+    string = JSON.stringify encrypted
+    json = sjcl.decrypt password, string
+    JSON.parse json
 
 module.exports.PlayerView = class PlayerView
   constructor: (player) ->
@@ -33,14 +38,9 @@ module.exports.HandView = class HandView
     @id = hand.id
     @table_id = hand.table.id
     @table_players = (new PlayerView p for k,p of hand.table.players)
+    @pocket_cards = hand.pocket_cards or {}
     @community_cards = hand.community_cards or []
-    @pocket_cards = {}
-    for player_id, cards of hand.pocket_cards
-      reveal = hand.reveals?.indexOf(player_id) >= 0
-      player_secret = hand.table.players[player_id].secret
-      @pocket_cards[player_id] = []
-      for c in cards
-        @pocket_cards[player_id].push if reveal then c else u.encrypt c, player_secret
+
 
 module.exports.Service = class Service
 
@@ -102,14 +102,14 @@ module.exports.Service = class Service
         card = hand.deck.pop()
         hand.pocket_cards ?= {}
         hand.pocket_cards[player.id] ?= []
-        hand.pocket_cards[player.id].push card
+        hand.pocket_cards[player.id].push u.encrypt card, player.secret
         @updateHand hand, callback
 
-  revealCards: (hand_id, table_secret, player_id, player_secret, callback) ->
+  revealCard: (hand_id, table_secret, player_id, player_secret, card_idx, callback) ->
     @withHand hand_id, table_secret, (hand) =>
       @withPlayer player_id, player_secret, (player) =>
-        hand.reveals ?= []
-        hand.reveals.push player.id
+        card = hand.pocket_cards[player.id][card_idx]
+        try hand.pocket_cards[player.id][card_idx] = u.decrypt card, player.secret if card
         @updateHand hand, callback
 
   placeCard: (hand_id, table_secret, callback) ->

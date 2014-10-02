@@ -13,7 +13,7 @@ describe 'the model', ->
     expect(model.Table).to.exist
     expect(model.Player).to.exist
 
-  it 'should cards with number and suit', ->
+  it 'should create cards with number and suit', ->
     card = new model.Card 'X', 'X'
     expect(card.suit).to.equal 'X'
     expect(card.number).to.equal 'X'

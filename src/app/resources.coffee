@@ -44,7 +44,7 @@ router.post '/hand/:hand_id', (request,response) ->
   hand_id = request.params.hand_id
   {table_secret} = body.place if body.place
   {table_secret,player_id} = body.deal if body.deal
-  {table_secret,player_id,player_secret} = body.reveal if body.reveal
+  {table_secret,player_id,player_secret,card_idx} = body.reveal if body.reveal
 
   callback = (table_view) ->
     response
@@ -54,4 +54,4 @@ router.post '/hand/:hand_id', (request,response) ->
   switch
     when body.deal then router.delegate.dealCard hand_id, table_secret, player_id, callback
     when body.place then router.delegate.placeCard hand_id, table_secret, callback
-    when body.reveal then router.delegate.revealCards hand_id, table_secret, player_id, player_secret, callback
+    when body.reveal then router.delegate.revealCard hand_id, table_secret, player_id, player_secret, card_idx, callback

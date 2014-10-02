@@ -118,6 +118,7 @@ describe 'the resources', ->
           table_secret: ctx.table.secret
           player_id: ctx.players[0].id
           player_secret: ctx.players[0].secret
+          card_idx: 0
       .expect 'Content-Type', /json/
       .expect 'Content-Length', 282
       .expect 201, done
