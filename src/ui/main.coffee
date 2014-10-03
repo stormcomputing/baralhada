@@ -44,7 +44,7 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
             $rootScope.$digest()
 
       $rootScope.$watch 'user', (user) -> if user
-        $http.post '/player', name: user.displayName, img: user.image.url
+        $http.post '/player', name: user.displayName, img: user.image.url, id: user.id
           .success (player) -> $rootScope.player = player
 
     $rootScope.login true # silent login
