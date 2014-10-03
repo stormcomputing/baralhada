@@ -20,7 +20,7 @@ define 'g', ->
     req ['gapi!client'], ->
       gapi.client.load api, version, onload
 
-define 'gapis', ['gapi!auth','g!plus,v1','g!urlshortener,v1'], ->
+define 'gapis', ['gapi!auth','g!plus,v1'], ->
 
 define 'styles', [
   'css!app'
@@ -36,7 +36,7 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
     $rootScope.login = (immediate=false) ->
       gapi.auth.authorize
         immediate: immediate
-        scope: 'https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/urlshortener'
+        scope: 'https://www.googleapis.com/auth/plus.me'
         client_id: '701172226637-i36kq61j3f8hf2figvk2o1aam9d8oblm.apps.googleusercontent.com'
         (auth) -> if auth.status.signed_in
           gapi.client.plus.people.get(userId: 'me').execute (user) ->
@@ -79,34 +79,23 @@ define 'app', ['angular','sjcl','angularfire','gapis'], (angular, sjcl) ->
       ref = new Firebase("http://baralhada-public.firebaseio.com/#{table.id}")
       $scope.$root.hand = $firebase(ref).$asObject()
 
-  app.controller 'TableCtrl', ($scope, $http, $location) ->
+  app.controller 'TableCtrl', ($scope, $http, $location, $q) ->
 
     {table_id,table_secret} = $location.search()
-    #$location.url ''
 
     if table_id # view table
       $scope.$root.table = id: table_id
     else # create table
       $http.post('/table').success (table) -> $scope.$root.table = table
 
-    $scope.$root.$watchGroup ['player', 'table'], (values) ->
+    $scope.$root.$watchGroup ['player', 'table'], ([player,table]) ->
 
-      [player,table] = values
       table_secret ?= table?.secret
 
       if table
-
-        url = $location.absUrl()
-        urlshortener = (url, callback) ->
-          request = gapi.client.urlshortener.url.insert resource: longUrl: url
-          request.execute (response) ->
-            callback response.id
-
-        view_url = "#{url}#?table_id=#{table.id}"
-        urlshortener view_url, (shortUrl) -> $scope.$root.view_url ?= shortUrl
+        $location.search 'table_id', table.id
         if table.secret
-          share_url = "#{view_url}&table_secret=#{table.secret}"
-          urlshortener share_url, (shortUrl) -> $scope.$root.share_url ?= shortUrl
+          $location.search 'table_secret', table.secret
 
       if player and table_secret and not table.players?[player.id] # join table
 
