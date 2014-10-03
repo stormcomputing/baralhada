@@ -29,5 +29,8 @@
     "test": "gulp",
     "postinstall": "gulp jade coffee sass",
     "start": "coffee src/app/server.coffee"
+  },
+  "engines": {
+    "node": "0.10.x"
   }
 }

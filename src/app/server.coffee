@@ -55,7 +55,7 @@ app = express()
 app.use morgan 'dev'
 app.use bodyParser.json()
 app.use express.static "#{__dirname}/../../target/ui"
-app.use '/', resources
+app.use resources
 
 app.listen port
 console.log "Listening on port #{port}"
